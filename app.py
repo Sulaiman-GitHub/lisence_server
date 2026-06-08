@@ -8,24 +8,27 @@ from datetime import datetime, timedelta
 app = Flask(__name__)
 
 # Render/Supabase Connection String
-# IMPORTANT: This must be the "Connection String" (postgres://...), not the API URL
 DATABASE_URL = os.environ.get('DATABASE_URL')
-# Use ADMIN_PASSWORD to match what you entered in Render
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'cure-admin-secret')
 
+print(f"Startup: DATABASE_URL is {'set' if DATABASE_URL else 'NOT set'}")
+
 def get_db_connection():
-    # If using Supabase, ensure the URL starts with postgresql:// and uses sslmode=require
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL environment variable is not set")
+    
     url = DATABASE_URL
-    if url and url.startswith("postgres://"):
+    if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql://", 1)
     
-    conn = psycopg2.connect(url, sslmode='require')
-    return conn
+    return psycopg2.connect(url, sslmode='require')
 
 def init_db():
     if not DATABASE_URL:
+        print("Skipping DB init: DATABASE_URL not set")
         return
     try:
+        print("Initializing database...")
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute("""
@@ -44,8 +47,12 @@ def init_db():
         conn.commit()
         cur.close()
         conn.close()
+        print("Database initialized successfully")
     except Exception as e:
         print(f"Database Init Error: {e}")
+
+# Initialize DB on startup (works with Gunicorn)
+init_db()
 
 @app.route('/')
 def home():
