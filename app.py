@@ -52,15 +52,18 @@ def login_required(f):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        password = request.form.get('password', '').strip()
-        expected = os.environ.get('ADMIN_PASSWORD', 'admin123').strip()
-        if password == expected:
-            session['logged_in'] = True
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid password. Please check your Render environment variables.', 'danger')
-    return render_template('login.html')
+    try:
+        if request.method == 'POST':
+            password = request.form.get('password', '').strip()
+            expected = os.environ.get('ADMIN_PASSWORD', 'admin123').strip()
+            if password == expected:
+                session['logged_in'] = True
+                return redirect(url_for('dashboard'))
+            else:
+                flash('Invalid password. Please check your Render environment variables.', 'danger')
+        return render_template('login.html')
+    except Exception as e:
+        return f"CRITICAL LOGIN ERROR: {str(e)}", 500
 
 @app.route('/logout')
 def logout():
@@ -70,11 +73,10 @@ def logout():
 @app.route('/')
 @login_required
 def dashboard():
-    if not supabase:
-        flash("Supabase is not configured. Please check your environment variables.", "danger")
-        return render_template('dashboard.html', total_licenses=0, active_licenses=0, total_revenue=0)
-
     try:
+        if not supabase:
+            return "ERROR: Supabase Client not initialized. Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.", 500
+
         # Top Summary Cards
         licenses_res = supabase.table('licenses').select('count', count='exact').execute()
         total_licenses = licenses_res.count if licenses_res else 0
@@ -91,8 +93,7 @@ def dashboard():
                                active_licenses=active_licenses,
                                total_revenue=total_revenue)
     except Exception as e:
-        flash(f"Error fetching data from Supabase: {str(e)}", "danger")
-        return render_template('dashboard.html', total_licenses=0, active_licenses=0, total_revenue=0)
+        return f"CRITICAL DASHBOARD ERROR: {str(e)}", 500
 
 @app.route('/licenses')
 @login_required
