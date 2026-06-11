@@ -53,12 +53,13 @@ def login_required(f):
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        password = request.form.get('password')
-        if password == os.environ.get('ADMIN_PASSWORD', 'admin123'):
+        password = request.form.get('password', '').strip()
+        expected = os.environ.get('ADMIN_PASSWORD', 'admin123').strip()
+        if password == expected:
             session['logged_in'] = True
             return redirect(url_for('dashboard'))
         else:
-            flash('Invalid password', 'danger')
+            flash('Invalid password. Please check your Render environment variables.', 'danger')
     return render_template('login.html')
 
 @app.route('/logout')
