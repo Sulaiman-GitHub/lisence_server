@@ -17,7 +17,7 @@ EAT = timezone('Africa/Kampala')
 
 # Supabase Configuration
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
-SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY')
+SUPABASE_KEY = os.environ.get('SUPABASE_SERVICE_ROLE_KEY') or os.environ.get('SUPABASE_KEY')
 supabase: Client = None
 
 if SUPABASE_URL and SUPABASE_KEY:
@@ -75,7 +75,7 @@ def logout():
 def dashboard():
     try:
         if not supabase:
-            return "ERROR: Supabase Client not initialized. Check SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY environment variables.", 500
+            return "ERROR: Supabase Client not initialized. Check SUPABASE_URL and SUPABASE_KEY environment variables.", 500
 
         # Top Summary Cards
         licenses_res = supabase.table('licenses').select('count', count='exact').execute()
