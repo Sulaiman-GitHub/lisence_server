@@ -69,21 +69,29 @@ def logout():
 @app.route('/')
 @login_required
 def dashboard():
-    # Top Summary Cards
-    licenses_res = supabase.table('licenses').select('count', count='exact').execute()
-    total_licenses = licenses_res.count if licenses_res else 0
-    
-    active_res = supabase.table('licenses').select('count', count='exact').eq('is_active', True).execute()
-    active_licenses = active_res.count if active_res else 0
-    
-    # Revenue
-    payments_res = supabase.table('payments').select('amount_ugx').execute()
-    total_revenue = sum(p['amount_ugx'] for p in payments_res.data) if payments_res.data else 0
-    
-    return render_template('dashboard.html', 
-                           total_licenses=total_licenses, 
-                           active_licenses=active_licenses,
-                           total_revenue=total_revenue)
+    if not supabase:
+        flash("Supabase is not configured. Please check your environment variables.", "danger")
+        return render_template('dashboard.html', total_licenses=0, active_licenses=0, total_revenue=0)
+
+    try:
+        # Top Summary Cards
+        licenses_res = supabase.table('licenses').select('count', count='exact').execute()
+        total_licenses = licenses_res.count if licenses_res else 0
+        
+        active_res = supabase.table('licenses').select('count', count='exact').eq('is_active', True).execute()
+        active_licenses = active_res.count if active_res else 0
+        
+        # Revenue
+        payments_res = supabase.table('payments').select('amount_ugx').execute()
+        total_revenue = sum(p.get('amount_ugx', 0) for p in payments_res.data) if payments_res.data else 0
+        
+        return render_template('dashboard.html', 
+                               total_licenses=total_licenses, 
+                               active_licenses=active_licenses,
+                               total_revenue=total_revenue)
+    except Exception as e:
+        flash(f"Error fetching data from Supabase: {str(e)}", "danger")
+        return render_template('dashboard.html', total_licenses=0, active_licenses=0, total_revenue=0)
 
 @app.route('/licenses')
 @login_required
