@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>Payments History</h4>
+    <button class="btn btn-outline-primary">
+        <i class="fa fa-download me-2"></i> Export to CSV
+    </button>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card p-4">
+            <small class="text-muted">This Month</small>
+            <h4 class="mt-2">{{ 0 | format_ugx }}</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-4">
+            <small class="text-muted">Last Month</small>
+            <h4 class="mt-2">{{ 0 | format_ugx }}</h4>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-4">
+            <small class="text-muted">Total All Time</small>
+            <h4 class="mt-2 text-primary">{{ 0 | format_ugx }}</h4>
+        </div>
+    </div>
+</div>
+
+<div class="card p-0">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-4">Date</th>
+                    <th>Pharmacy</th>
+                    <th>Plan</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Reference</th>
+                    <th>Period</th>
+                    <th class="pe-4">Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in payments %}
+                <tr>
+                    <td class="ps-4">{{ p.date }}</td>
+                    <td>{{ p.pharmacy_name }}</td>
+                    <td>{{ p.plan }}</td>
+                    <td>{{ p.amount_ugx | format_ugx }}</td>
+                    <td>{{ p.method }}</td>
+                    <td><code>{{ p.reference }}</code></td>
+                    <td>{{ p.period }}</td>
+                    <td class="pe-4">{{ p.notes }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

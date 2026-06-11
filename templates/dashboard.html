@@ -1,0 +1,76 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row g-4">
+    <div class="col-md-3">
+        <div class="card p-4">
+            <small class="text-muted text-uppercase fw-bold">Total Licenses</small>
+            <h2 class="mt-2">{{ total_licenses }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-4">
+            <small class="text-muted text-uppercase fw-bold">Active Now</small>
+            <h2 class="mt-2 text-success">{{ active_licenses }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-4">
+            <small class="text-muted text-uppercase fw-bold">Total Revenue</small>
+            <h2 class="mt-2">{{ total_revenue | format_ugx }}</h2>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card p-4">
+            <small class="text-muted text-uppercase fw-bold">Expiring Soon</small>
+            <h2 class="mt-2 text-warning">0</h2>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h5 class="mb-4">Recent Activations</h5>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Pharmacy</th>
+                            <th>Plan</th>
+                            <th>Activated At</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Loop through recent activations -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4">
+            <h5 class="mb-4">Quick Generate</h5>
+            <form action="{{ url_for('generate_license') }}" method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Plan</label>
+                    <select name="plan" class="form-select">
+                        <option value="Starter">Starter</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Premium">Premium</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Period</label>
+                    <select name="period" class="form-select">
+                        <option value="monthly">Monthly</option>
+                        <option value="annual">Annual</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Generate Key</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

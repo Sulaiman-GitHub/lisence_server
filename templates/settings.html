@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<h4 class="mb-4">System Settings</h4>
+
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card p-4 h-100">
+            <h6 class="mb-3"><i class="fa fa-building me-2"></i> Your Business Details</h6>
+            <form>
+                <div class="mb-3">
+                    <label class="form-label text-muted small text-uppercase">Company Name</label>
+                    <input type="text" class="form-control" value="Fat-Tech">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small text-uppercase">Support Phone (WhatsApp)</label>
+                    <input type="text" class="form-control" value="+2567487278735">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted small text-uppercase">Support Email</label>
+                    <input type="email" class="form-control" value="support@curepharma.ug">
+                </div>
+                <button type="submit" class="btn btn-primary">Update Details</button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card p-4 h-100">
+            <h6 class="mb-3"><i class="fa fa-tags me-2"></i> Default Plan Prices (UGX)</h6>
+            <div class="table-responsive">
+                <table class="table table-borderless align-middle">
+                    <thead>
+                        <tr class="text-muted small text-uppercase">
+                            <th>Plan</th>
+                            <th>Monthly</th>
+                            <th>Annual</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Starter</td>
+                            <td><input type="number" class="form-control" value="100000"></td>
+                            <td><input type="number" class="form-control" value="1000000"></td>
+                        </tr>
+                        <tr>
+                            <td>Standard</td>
+                            <td><input type="number" class="form-control" value="250000"></td>
+                            <td><input type="number" class="form-control" value="2500000"></td>
+                        </tr>
+                        <tr>
+                            <td>Premium</td>
+                            <td><input type="number" class="form-control" value="500000"></td>
+                            <td><input type="number" class="form-control" value="5000000"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn btn-primary mt-auto">Save Prices</button>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h6 class="mb-3"><i class="fa fa-bell me-2"></i> Notifications</h6>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" checked>
+                <label class="form-check-label">Email me when license is activated</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" checked>
+                <label class="form-check-label">Email me when license expires</label>
+            </div>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" checked>
+                <label class="form-check-label">Email me 7 days before expiry</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h6 class="mb-3"><i class="fa fa-lock me-2"></i> Change Admin Password</h6>
+            <form>
+                <div class="mb-3">
+                    <input type="password" class="form-control" placeholder="Current Password">
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" placeholder="New Password">
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" placeholder="Confirm New Password">
+                </div>
+                <button type="submit" class="btn btn-primary">Change Password</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
