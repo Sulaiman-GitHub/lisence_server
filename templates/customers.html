@@ -41,3 +41,11 @@
     {% endfor %}
 </div>
 {% endblock %}
+
+{% block scripts %}
+<script>
+function viewLicense(key) {
+    window.location.href = "{{ url_for('licenses') }}?search=" + encodeURIComponent(key);
+}
+</script>
+{% endblock %}

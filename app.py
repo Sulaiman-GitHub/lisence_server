@@ -121,37 +121,44 @@ def licenses():
 @app.route('/licenses/generate', methods=['POST'])
 @login_required
 def generate_license():
-    plan = request.form.get('plan')
-    period = request.form.get('period')
-    terminals = int(request.form.get('terminals', 1))
-    
-    # Max Users based on plan
-    max_users = 2 if plan == 'Starter' else (5 if plan == 'Standard' else 20)
-    
-    # Generate Key
-    key = f"CURE-{secrets.token_hex(2).upper()}-{secrets.token_hex(2).upper()}-{secrets.token_hex(2).upper()}"
-    
-    # Expiry Date Calculation
-    today = date.today()
-    if period == 'monthly':
-        expires = today.replace(month=today.month + 1) if today.month < 12 else today.replace(year=today.year + 1, month=1)
-    else: # annual
-        expires = today.replace(year=today.year + 1)
+    try:
+        plan = request.form.get('plan')
+        period = request.form.get('period')
+        terminals = int(request.form.get('terminals', 1))
         
-    new_license = {
-        'license_key': key,
-        'plan': plan,
-        'max_terminals': terminals,
-        'max_users': max_users,
-        'expires_at': expires.isoformat(),
-        'is_activated': True,
-        'machine_ids': '[]',
-        'created_at': get_now_eat().isoformat()
-    }
-    
-    supabase.table('licenses').insert(new_license).execute()
-    flash(f'License {key} generated successfully!', 'success')
-    return redirect(url_for('licenses'))
+        # Max Users based on plan
+        max_users = 2 if plan == 'Starter' else (5 if plan == 'Standard' else 20)
+        
+        # Generate Key
+        key = f"CURE-{secrets.token_hex(2).upper()}-{secrets.token_hex(2).upper()}-{secrets.token_hex(2).upper()}"
+        
+        # Expiry Date Calculation
+        today = date.today()
+        if period == 'monthly':
+            # Handle year overflow for December
+            if today.month == 12:
+                expires = today.replace(year=today.year + 1, month=1)
+            else:
+                expires = today.replace(month=today.month + 1)
+        else: # annual
+            expires = today.replace(year=today.year + 1)
+            
+        new_license = {
+            'license_key': key,
+            'plan': plan,
+            'max_terminals': terminals,
+            'max_users': max_users,
+            'expires_at': expires.isoformat(),
+            'is_activated': True,
+            'machine_ids': '[]',
+            'created_at': get_now_eat().isoformat()
+        }
+        
+        supabase.table('licenses').insert(new_license).execute()
+        flash(f'License {key} generated successfully!', 'success')
+        return redirect(url_for('licenses'))
+    except Exception as e:
+        return f"ERROR GENERATING LICENSE: {str(e)}", 500
 
 @app.route('/licenses/revoke/<key>', methods=['POST'])
 @login_required
