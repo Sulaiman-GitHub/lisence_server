@@ -81,7 +81,7 @@ def dashboard():
         licenses_res = supabase.table('licenses').select('count', count='exact').execute()
         total_licenses = licenses_res.count if licenses_res else 0
         
-        active_res = supabase.table('licenses').select('count', count='exact').eq('is_active', True).execute()
+        active_res = supabase.table('licenses').select('count', count='exact').eq('is_activated', True).execute()
         active_licenses = active_res.count if active_res else 0
         
         # Revenue
@@ -136,7 +136,7 @@ def generate_license():
         'plan': plan,
         'max_terminals': terminals,
         'expires_at': expires.isoformat(),
-        'is_active': True,
+        'is_activated': True,
         'machine_ids': '[]',
         'created_at': get_now_eat().isoformat()
     }
@@ -150,14 +150,14 @@ def generate_license():
 def revoke_license(key):
     confirm = request.form.get('confirm')
     if confirm == 'REVOKE':
-        supabase.table('licenses').update({'is_active': False}).eq('license_key', key).execute()
+        supabase.table('licenses').update({'is_activated': False}).eq('license_key', key).execute()
         flash(f'License {key} revoked.', 'warning')
     return redirect(url_for('licenses'))
 
 @app.route('/licenses/restore/<key>', methods=['POST'])
 @login_required
 def restore_license(key):
-    supabase.table('licenses').update({'is_active': True}).eq('license_key', key).execute()
+    supabase.table('licenses').update({'is_activated': True}).eq('license_key', key).execute()
     flash(f'License {key} restored.', 'success')
     return redirect(url_for('licenses'))
 
@@ -209,7 +209,7 @@ def api_activate():
         return jsonify({'valid': False, 'error': "Invalid license key"}), 404
         
     lic = res.data[0]
-    if not lic['is_active']:
+    if not lic['is_activated']:
         return jsonify({'valid': False, 'error': "License revoked. Contact support."}), 403
         
     expires_at = datetime.fromisoformat(lic['expires_at']).date()
@@ -264,7 +264,7 @@ def api_validate():
         return jsonify({'valid': False, 'error': "Invalid license"}), 404
         
     lic = res.data[0]
-    if not lic['is_active']:
+    if not lic['is_activated']:
         return jsonify({'valid': False, 'error': "License revoked"}), 403
         
     expires_at = datetime.fromisoformat(lic['expires_at']).date()
@@ -302,7 +302,7 @@ def api_transfer():
     if not res.data: return jsonify({'success': False, 'error': "Invalid license"}), 404
     
     lic = res.data[0]
-    if not lic['is_active']: return jsonify({'success': False, 'error': "Revoked"}), 403
+    if not lic['is_activated']: return jsonify({'success': False, 'error': "Revoked"}), 403
     
     machine_ids = json.loads(lic['machine_ids'])
     if old_id in machine_ids:

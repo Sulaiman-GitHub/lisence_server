@@ -14,7 +14,7 @@ def test_api_activate_success(mock_supabase, client):
     # Mock data
     mock_supabase.table().select().eq().execute.return_value.data = [{
         'license_key': 'CURE-TEST-KEY',
-        'is_active': True,
+        'is_activated': True,
         'expires_at': '2030-01-01',
         'max_terminals': 2,
         'machine_ids': '[]',
@@ -41,7 +41,7 @@ def test_api_activate_success(mock_supabase, client):
 def test_api_validate_expired(mock_supabase, client):
     mock_supabase.table().select().eq().execute.return_value.data = [{
         'license_key': 'CURE-TEST-KEY',
-        'is_active': True,
+        'is_activated': True,
         'expires_at': '2020-01-01', # Expired
         'machine_ids': '["MAC1"]',
         'plan': 'Standard',
@@ -62,7 +62,7 @@ def test_api_validate_expired(mock_supabase, client):
 def test_api_transfer_success(mock_supabase, client):
     mock_supabase.table().select().eq().execute.return_value.data = [{
         'license_key': 'CURE-TEST-KEY',
-        'is_active': True,
+        'is_activated': True,
         'machine_ids': '["MAC_OLD"]',
     }]
     

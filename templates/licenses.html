@@ -50,7 +50,7 @@
                     <td>{{ (lic.machine_ids|from_json)|length }} / {{ lic.max_terminals }}</td>
                     <td>{{ lic.expires_at }}</td>
                     <td>
-                        {% if not lic.is_active %}
+                        {% if not lic.is_activated %}
                             <span class="badge bg-danger">Revoked</span>
                         {% elif lic.expires_at < now_date %}
                             <span class="badge bg-secondary">Expired</span>
@@ -64,7 +64,7 @@
                                 Actions
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end">
-                                {% if lic.is_active %}
+                                {% if lic.is_activated %}
                                 <li>
                                     <form action="{{ url_for('revoke_license', key=lic.license_key) }}" method="POST" onsubmit="return confirmRevoke()">
                                         <input type="hidden" name="confirm" id="confirm_{{ lic.license_key }}">

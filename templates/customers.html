@@ -12,7 +12,7 @@
             <h5 class="mb-1">{{ c.pharmacy_name }}</h5>
             <div class="mb-3">
                 <span class="badge badge-{{ c.plan }}">{{ c.plan }}</span>
-                {% if c.is_active %}
+                {% if c.is_activated %}
                 <span class="badge bg-success">Active</span>
                 {% else %}
                 <span class="badge bg-danger">Revoked</span>
