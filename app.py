@@ -84,9 +84,13 @@ def dashboard():
         active_res = supabase.table('licenses').select('count', count='exact').eq('is_activated', True).execute()
         active_licenses = active_res.count if active_res else 0
         
-        # Revenue
-        payments_res = supabase.table('payments').select('amount_ugx').execute()
-        total_revenue = sum(p.get('amount_ugx', 0) for p in payments_res.data) if payments_res.data else 0
+        # Revenue - Handle missing table gracefully
+        total_revenue = 0
+        try:
+            payments_res = supabase.table('payments').select('amount_ugx').execute()
+            total_revenue = sum(p.get('amount_ugx', 0) for p in payments_res.data) if payments_res.data else 0
+        except Exception as pe:
+            print(f"Note: Payments table issue: {str(pe)}")
         
         return render_template('dashboard.html', 
                                total_licenses=total_licenses, 
@@ -121,6 +125,9 @@ def generate_license():
     period = request.form.get('period')
     terminals = int(request.form.get('terminals', 1))
     
+    # Max Users based on plan
+    max_users = 2 if plan == 'Starter' else (5 if plan == 'Standard' else 20)
+    
     # Generate Key
     key = f"CURE-{secrets.token_hex(2).upper()}-{secrets.token_hex(2).upper()}-{secrets.token_hex(2).upper()}"
     
@@ -135,6 +142,7 @@ def generate_license():
         'license_key': key,
         'plan': plan,
         'max_terminals': terminals,
+        'max_users': max_users,
         'expires_at': expires.isoformat(),
         'is_activated': True,
         'machine_ids': '[]',
@@ -177,8 +185,14 @@ def reset_machines(key):
 @app.route('/payments')
 @login_required
 def payments():
-    res = supabase.table('payments').select('*').order('date', desc=True).execute()
-    payments_list = res.data if res else []
+    try:
+        res = supabase.table('payments').select('*').order('date', desc=True).execute()
+        payments_list = res.data if res else []
+    except Exception as pe:
+        print(f"Note: Payments table issue: {str(pe)}")
+        payments_list = []
+        flash("Note: Payments table not found in Supabase. History is unavailable.", "warning")
+        
     return render_template('payments.html', payments=payments_list)
 
 @app.route('/customers')
